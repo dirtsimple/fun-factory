@@ -1,0 +1,31 @@
+{
+	"name" : "dirtsimple/fun-factory",
+	"type" : "library",
+	"description" : "Fluently and efficiently compose functions, methods, and lambda-expression strings",
+	"license" : "MIT",
+	"require" : {
+		"php" : ">=5.6"
+	},
+	"keywords" : [
+		"functional programming",
+		"partial application",
+		"fluent interfaces",
+		"function composition"
+	],
+	"autoload" : {
+		"psr-4" : {
+			"dirtsimple\\" : "src"
+		},
+		"files" : [
+			"src/functions.php"
+		]
+	},
+	"require-dev" : {
+		"peridot-php/leo" : "~1.6",
+		"peridot-php/peridot" : "~1.19",
+		"brain/monkey" : "~2.2"
+	},
+	"scripts" : {
+		"test" : "peridot"
+	}
+}
