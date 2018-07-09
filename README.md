@@ -53,6 +53,8 @@ $f1 = fn()->foo($bar)->baz();
 
 
 $f2 = fn()->aProp[$key];
+
+​
 ```
 
 <td>
@@ -81,6 +83,8 @@ $f1 = fn('array_flip', 'array_reverse');
 
 
 $f2 = fn('func', [$ob, 'meth'], '$_*2');
+
+​
 ```
 
 <td>
@@ -113,6 +117,10 @@ $unset = fn()->offsetUnset($foo);
 
 
 $exists = fn()->offsetExists($foo);
+
+
+
+​
 ```
 
 <td>
