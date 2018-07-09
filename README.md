@@ -4,16 +4,160 @@ Tired of typing `function($x) use($y) { return $z; }` when all you want is a sim
 
 Enter **fun-factory**.  Just `composer require dirtsimple/fun-factory` and `use function dirtsimple\fn;` to get the following functional programming shortcuts:
 
-|                                                  | Fun Factory                       | PHP Equivalent |
-| --------------------------------------------------------- | --------------------------------- | --------------------------------------------------------- |
-| **Identity** | `$f = fn();`          | `$f = function ($_) { return $_; };` |
-| **Composition** | `$f = fn('foo', [$this, 'bar']);` | `$f = function ($_) { return foo($this->bar($_));` |
-| **Lambda** | `$f = fn('x(y($_))');` | `$f = function ($_) { return x(y($_));` |
-| **Methods** | `$f = fn()->foo('bar');`          | `$f = function ($_) { return $_->foo('bar'); };` |
-| **Properties<br /> and Elements** | `$f = fn()->aProp['key'];` | `$f = function ($_) { return $_->aProp['key']; };` |
-| **Array Operators** | `$f = fn()->offsetSet('foo', 'bar');` | `$f = function ($_) { $_['foo']='bar'; return $_; }` |
-|  | `$f = fn()->offsetUnset('foo');` | `$f = function ($_) { unset($_['foo']); return $_; }` |
-|  | `$f = fn()->offsetExists('foo');` | `$f = function ($_) {`<br />`     return is_array($_)`<br />`          ? array_key_exists('foo', $_)`<br />`          : $_->offsetExists('foo');`<br />`};` |
+<table>
+<tr><th><th>Fun Factory<th>PHP Equivalent
+<tr><td>
+
+**Identity**
+
+<td>
+
+```php
+$f = fn();
+```
+
+<td>
+
+```php
+$f = function ($arg) { return $arg; };
+```
+
+<tr style="display:none">
+<tr><td>
+
+**Lambda Strings**
+
+<td>
+
+```php
+$f = fn('$_ * 2');
+```
+
+<td>
+
+```php
+$f = function ($arg) { return $arg * 2; };
+```
+<tr style="display:none">
+<tr><td rowspan="3">
+
+**Chaining/Partials**
+
+(Any number of methods, keys, and properties)
+
+<td>
+
+```php
+$f = fn()->foo($bar)->baz();
+```
+
+<td>
+
+```php
+$f = function ($arg) use ($bar) {
+    return $arg->foo($bar)->baz();
+};
+```
+<tr style="display:none">
+<tr><td>
+
+```php
+$f = fn()->aProp[$key];
+```
+
+<td>
+
+```php
+$f = function ($arg) use ($key) {
+    return $arg->aProp[$key];
+};
+```
+<tr style="display:none">
+<tr><td rowspan="3">
+
+**Composition**
+
+(Any number of PHP callables or lambda strings)
+
+<td>
+
+```php
+$f = fn('array_flip', 'array_reverse');
+```
+
+<td>
+
+```php
+$f = function ($arg) {
+    return array_flip(array_reverse($arg));
+};
+```
+<tr style="display:none">
+<tr><td>
+
+```php
+$f = fn('func', [$ob, 'meth'], '$_*2');
+```
+
+<td>
+
+```php
+$f = function ($arg) use ($obj) {
+    return func($ob->meth($arg * 2));
+};
+```
+<tr style="display:none">
+<tr><td rowspan="5">
+
+**Chainable Array Item Operators**
+
+<td>
+
+```php
+$f = fn()->offsetSet($foo, $bar);
+```
+
+<td>
+
+```php
+$f = function ($arg) use ($foo, $bar) {
+    $arg[$foo] = $bar;
+    return $arg;
+};
+```
+
+<tr style="display:none">
+<tr><td>
+
+```php
+$f = fn()->offsetUnset($foo);
+```
+
+<td>
+
+```php
+$f = function ($arg) use ($foo) {
+    unset($arg[$foo]);
+    return $arg;
+};
+```
+<tr style="display:none">
+<tr><td>
+
+```php
+$f = fn()->offsetExists($foo);
+```
+
+<td>
+
+```php
+$f = function ($arg) use ($foo) {
+    return is_array($arg)
+        ? array_key_exists($foo, $arg)
+        : $arg->offsetExists($foo);
+};
+```
+</table>
 
 The `fn()` function accepts zero or more PHP callables (or lambda expression strings), returning the functional composition of those arguments.  String arguments that aren't syntactically PHP function or static method names are assumed to be PHP expressions, and converted to lambda functions taking `$_` as a parameter.  (The resulting closures are cached, so repeated calls to say, `fn('$_ * 2')`, don't use excess memory or waste time recompiling.)
 
