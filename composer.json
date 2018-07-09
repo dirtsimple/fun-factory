@@ -26,6 +26,6 @@
 		"brain/monkey" : "~2.2"
 	},
 	"scripts" : {
-		"test" : "peridot"
+		"test" : "peridot specs"
 	}
 }
