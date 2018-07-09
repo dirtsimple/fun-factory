@@ -39,119 +39,96 @@ $f = fn('$_ * 2');
 $f = function ($arg) { return $arg * 2; };
 ```
 <tr style="display:none">
-<tr><td rowspan="3">
+<tr><td>
 
 **Chaining/Partials**
 
 (Any number of methods, keys, and properties)
 
-<td>
+<td valign="top">
 
 ```php
-$f = fn()->foo($bar)->baz();
+$f1 = fn()->foo($bar)->baz();
+
+
+
+$f2 = fn()->aProp[$key];
 ```
 
 <td>
 
 ```php
-$f = function ($arg) use ($bar) {
+$f1 = function ($arg) use ($bar) {
     return $arg->foo($bar)->baz();
 };
-```
-<tr style="display:none">
-<tr><td>
 
-```php
-$f = fn()->aProp[$key];
-```
-
-<td>
-
-```php
-$f = function ($arg) use ($key) {
+$f2 = function ($arg) use ($key) {
     return $arg->aProp[$key];
 };
 ```
 <tr style="display:none">
-<tr><td rowspan="3">
+<tr><td>
 
 **Composition**
 
 (Any number of PHP callables or lambda strings)
 
-<td>
+<td valign="top">
 
 ```php
-$f = fn('array_flip', 'array_reverse');
+$f1 = fn('array_flip', 'array_reverse');
+
+
+
+$f2 = fn('func', [$ob, 'meth'], '$_*2');
 ```
 
 <td>
 
 ```php
-$f = function ($arg) {
+$f1 = function ($arg) {
     return array_flip(array_reverse($arg));
 };
-```
-<tr style="display:none">
-<tr><td>
 
-```php
-$f = fn('func', [$ob, 'meth'], '$_*2');
-```
-
-<td>
-
-```php
-$f = function ($arg) use ($obj) {
+$f2 = function ($arg) use ($ob) {
     return func($ob->meth($arg * 2));
 };
 ```
 <tr style="display:none">
-<tr><td rowspan="5">
+<tr><td>
 
 **Chainable Array Item Operators**
 
-<td>
+<td valign="top">
 
 ```php
-$f = fn()->offsetSet($foo, $bar);
+$set = fn()->offsetSet($foo, $bar);
+
+
+
+
+$unset = fn()->offsetUnset($foo);
+
+
+
+
+$exists = fn()->offsetExists($foo);
 ```
 
 <td>
 
 ```php
-$f = function ($arg) use ($foo, $bar) {
+$set = function ($arg) use ($foo, $bar) {
     $arg[$foo] = $bar;
     return $arg;
 };
-```
 
-<tr style="display:none">
-<tr><td>
-
-```php
-$f = fn()->offsetUnset($foo);
-```
-
-<td>
-
-```php
-$f = function ($arg) use ($foo) {
+$unset = function ($arg) use ($foo) {
     unset($arg[$foo]);
     return $arg;
 };
-```
-<tr style="display:none">
-<tr><td>
 
-```php
-$f = fn()->offsetExists($foo);
-```
-
-<td>
-
-```php
-$f = function ($arg) use ($foo) {
+$exists = function ($arg) use ($foo) {
     return is_array($arg)
         ? array_key_exists($foo, $arg)
         : $arg->offsetExists($foo);
