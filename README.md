@@ -19,7 +19,7 @@ $f = fn();
 <td>
 
 ```php
-$f = function ($arg) { return $arg; };
+$f = function ($arg=null) { return $arg; };
 ```
 
 <tr style="display:none">
@@ -36,7 +36,7 @@ $f = fn('$_ * 2');
 <td>
 
 ```php
-$f = function ($arg) { return $arg * 2; };
+$f = function ($arg=null) { return $arg * 2; };
 ```
 <tr style="display:none">
 <tr><td>
@@ -60,11 +60,11 @@ $f2 = fn()->aProp[$key];
 <td>
 
 ```php
-$f1 = function ($arg) use ($bar) {
+$f1 = function ($arg=null) use ($bar) {
     return $arg->foo($bar)->baz();
 };
 
-$f2 = function ($arg) use ($key) {
+$f2 = function ($arg=null) use ($key) {
     return $arg->aProp[$key];
 };
 ```
@@ -90,11 +90,11 @@ $f2 = fn('func', [$ob, 'meth'], '$_*2');
 <td>
 
 ```php
-$f1 = function ($arg) {
+$f1 = function ($arg=null) {
     return array_flip(array_reverse($arg));
 };
 
-$f2 = function ($arg) use ($ob) {
+$f2 = function ($arg=null) use ($ob) {
     return func($ob->meth($arg * 2));
 };
 ```
@@ -126,17 +126,17 @@ $exists = fn()->offsetExists($foo);
 <td>
 
 ```php
-$set = function ($arg) use ($foo, $bar) {
+$set = function ($arg=null) use ($foo, $bar) {
     $arg[$foo] = $bar;
     return $arg;
 };
 
-$unset = function ($arg) use ($foo) {
+$unset = function ($arg=null) use ($foo) {
     unset($arg[$foo]);
     return $arg;
 };
 
-$exists = function ($arg) use ($foo) {
+$exists = function ($arg=null) use ($foo) {
     return is_array($arg)
         ? array_key_exists($foo, $arg)
         : $arg->offsetExists($foo);
@@ -158,9 +158,11 @@ But wait, there's more!  Add `use dirtsimple\fn;` to your code *now*, and you'll
 
 ### fn::bind($callable, ...$args)
 
-Returns a `fn()` that when called with `$x` returns `$callable(...$args, $x)`.  (That is, any arguments after `$callable` are passed in first.)  `$callable` *must* be a PHP callable (not a lambda expression string), and it is checked for validity at bind time.  (Which may cause autoloading, if it names a static method.)
+Returns a `fn()` that when called with `$x` returns `$callable(...$args, $x)`.  (That is, any arguments after `$callable` are passed in first.)  Note that `fn()` objects take exactly one parameter (which defaults to `null` if omitted), so `$callable()` will always receive exactly one argument after `$args`.
 
-(Note that `fn()` objects themselves only take one parameter, so passing a `fn()` to `bind()` effectively makes it act as if it were always being passed the first element of `$args` instead of whatever argument is actually given.)
+`$callable` *must* be a PHP callable (not a lambda expression string), and it is checked for validity at bind time.  (Which may cause autoloading, if it names a static method.)
+
+(Note that `fn()` objects themselves only take one parameter, so passing a `fn()` as the `$callable` to `bind()` effectively makes it act as if it were always being passed the first element of `$args`, instead of whatever argument is actually given.)
 
 ### fn::tap(...$callables)
 

@@ -36,7 +36,7 @@ class Factory implements \ArrayAccess {
 
 	// --- Interpreter --- //
 
-	function __invoke($_) {
+	function __invoke($_=null) {
 		foreach ($this->ops as $opinfo) {
 			if ( $op = $opinfo[0] ) {
 				if (is_int($op)) {

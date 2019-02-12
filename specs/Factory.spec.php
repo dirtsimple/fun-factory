@@ -16,6 +16,9 @@ describe("fn", function() {
 	it('() => ($x) => $x', function() {
 		$f = fn(); expect($f(42))->to->equal(42);
 	});
+	it('() => () => null', function() {
+		$f = fn(); expect($f())->to->equal(null);
+	});
 	it("() => the same callable each time", function() {
 		$f = fn();
 		expect(fn())->to->equal($f);
@@ -113,6 +116,12 @@ describe('fn::bind($callable, ...$args)', function() {
 		$mock->shouldReceive('testMe')->with('blue', 32, 'bar')->once()->andReturn("foo");
 		$f = fn::bind([$mock, 'testMe'], 'blue', 32);
 		expect($f('bar'))->to->equal('foo');
+	}));
+	it('receives null after $args if called with no arguments', tearDown(function(){
+		$mock = Mockery::mock();
+		$mock->shouldReceive('testMe')->with('blue', 32, null)->once()->andReturn("foo");
+		$f = fn::bind([$mock, 'testMe'], 'blue', 32);
+		expect($f())->to->equal('foo');
 	}));
 });
 
