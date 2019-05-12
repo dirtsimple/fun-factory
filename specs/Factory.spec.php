@@ -7,7 +7,7 @@ use \Mockery;
 
 function tearDown($func) {
 	return function() use($func) {
-		try { return $func(); } 
+		try { return $func(); }
 		finally { \Brain\Monkey\tearDown(); }
 	};
 }
@@ -201,6 +201,50 @@ describe('fn::unless($cond, $ifFalse, $ifTrue=\'$_\')', function() {
 		$f = fn::unless('$_==2', '$_*3');
 		expect($f(1))->to->equal(3);
 		expect($f(2))->to->equal(2);
+	});
+});
+
+function test_transformer($scope, $target) {
+	beforeEach(function() use ($target) { $this->to_test = $target; });
+
+	it("defaults to an empty array as output", function(){
+		expect( $this->to_test( [], 42 ) )->to->equal([]);
+	});
+	it("maps the schema functions into the output", function(){
+		expect( $this->to_test( ['x'=>fn('$_*2'), 'y'=>fn('$_')], 42 ) )->to->equal(
+			['x'=>84, 'y'=>42]
+		);
+	});
+	it("includes or overwrites the passed-in output", function(){
+		expect( $this->to_test(
+			['x'=>fn('$_*2'), 'y'=>fn('$_')], 42, ['x'=>99, 'z'=>21]
+		) )->to->equal(
+			['x'=>84, 'z'=>21, 'y'=>42]
+		);
+	});
+	it("calls the reducer with (out, key, fn, in)", function(){
+		$schema = ['x'=>'$_*2', 'y'=>'$_'];
+		$log = ['initial'];
+		$logger = function($out, $key, $fn, $in) {
+			$out[] = [$out, $key, $fn, $in];
+			return $out;
+		};
+		$expected = $logger($log, 'x', '$_*2', 42);
+		$expected = $logger($expected, 'y', '$_', 42);
+
+		expect( $this->to_test($schema, 42, $log, $logger) )->to->equal($expected);
+	});
+}
+
+describe('fn::transform()', function(){
+	test_transformer($this, 'dirtsimple\fn::transform');
+});
+
+describe('fn::schema($schema)', function() {
+	describe('returns a function bound to $schema that', function() {
+		test_transformer($this, function($schema, ...$args) {
+			return fn::schema($schema)(...$args);
+		});
 	});
 });
 

@@ -63,6 +63,16 @@ class fn extends fun\Factory {
 			);
 	}
 
+	static function transform($schema, $input=null, $out=array(), $reducer=null){
+		$reducer = $reducer ?: function($out, $key, $fn, $in) { $out[$key] = $fn($in); return $out; };
+		foreach ($schema as $key => $fn) $out = $reducer($out, $key, $fn, $input);
+		return $out;
+	}
+
+	static function schema($schema){
+		return function(...$args) use($schema) { return static::transform($schema, ...$args); };
+	}
+
 	static function val($value) {
 		return fn()->andThen(fun\Factory::OP_VAL, $value);
 	}

@@ -156,13 +156,15 @@ You can then compose or stack the result, or expose composable/stackable results
 
 But wait, there's more!  Add `use dirtsimple\fn;` to your code *now*, and you'll also get these fine static methods at no additional cost:
 
-### fn::_(...$callables)
+### Composition and Binding
+
+#### fn::_(...$callables)
 
 Return a *pipelined* composition of `$callables`, with the result of each callable passed to the next in the chain.  For example, `fn::_('array_reverse', 'array_flip')` returns a callable that calls `array_reverse()` on its input, and then calls `array_flip()` on the result.
 
 This method behaves exactly the same as `fn()`, including support for lambda strings, except that its arguments are called in the opposite order.  That is, `fn($f, $g)` is equivalent to `fn::_($g, $f)` is equivalent to `function ($x) { return $f( $g( $x ) ); }`.
 
-### fn::bind($callable, ...$args)
+#### fn::bind($callable, ...$args)
 
 Returns a `fn()` that when called with `$x` returns `$callable(...$args, $x)`.  (That is, any arguments after `$callable` are passed in first.)  Note that `fn()` objects take exactly one parameter (which defaults to `null` if omitted), so `$callable()` will always receive exactly one argument after `$args`.
 
@@ -170,7 +172,7 @@ Returns a `fn()` that when called with `$x` returns `$callable(...$args, $x)`.  
 
 (Note that `fn()` objects themselves only take one parameter, so passing a `fn()` as the `$callable` to `bind()` effectively makes it act as if it were always being passed the first element of `$args`, instead of whatever argument is actually given.)
 
-### fn::tap(...$callables)
+#### fn::tap(...$callables)
 
 Returns a `fn()` that applies`fn(...$callables)` to its argument, but throws away the return value and returns the original argument instead.  Useful for creating side effects, this is roughly equivalent to:
 
@@ -181,19 +183,45 @@ function ($_) use ($f) { $f($_); return $_; }
 
 Except that a `fn()` is returned rather than a closure.
 
-### fn::val($value)
+#### fn::val($value)
 
 Returns a callable that returns `$value`.  Shorthand for `function() use ($value) { return $value; }`.
 
-### fn::when($cond, $ifTrue, $ifFalse='$_')
+### Conditionals
+
+#### fn::when($cond, $ifTrue, $ifFalse='$_')
 
 Returns a `fn()` roughly equivalent to `function($_) { return $cond($_) ? $ifTrue($_) : $ifFalse($_); }`, except that all three arguments can be lambda expression strings as well as PHP callables.
 
-### fn::unless($cond, $ifFalse, $ifTrue='$_')
+#### fn::unless($cond, $ifFalse, $ifTrue='$_')
 
 The same as `fn::when()`, but with the arguments swapped.
 
-### fn::is_callable_name($string)
+### Structure Transforms
+
+#### fn::transform($schema, $input=null, $out=array(), $reducer=null)
+
+Transform `$input` according to `$schema`.  The schema must be an array or iterable object of callables.  The results of invokng each callable on `$input` will be placed in the corresponding key of `$out`, which is then returned.
+
+The behavior of this function can be further customized by passing a `$reducer`: a callable taking four arguments: the current `$out` value, a `$key`, the original `$input`, and the callable found in `$schema[$key]`.  The return value of the reducer is then fed back into the next call or returned if there are no more entries in the schema.  The default reducer looks like this:
+
+```php
+function ($out, $key, $fn, $input) {
+    $out[$key] = $fn($input);
+    return $out;
+}
+```
+
+With an appropriate `$out` and `$reducer`, you can set properties, call methods, transform the keys, skip keys, filter the results, etc.
+
+
+#### fn::schema($schema)
+
+A shortcut for currying `fn::transform` with the given schema; i.e., it returns a function that, given an input, transforms it using the given schema.  (The `$out` and `$reducer` transform arguments can be passed as the second and third arguments to the returned function.)
+
+### Other Functions
+
+#### fn::is_callable_name($string)
 
 Returns true if `$string` is a syntactically valid PHP callable.  That is, if `$string` matches a regular expression for a possibly-namespaced function or static method.  The existence of the function, class, or method is not checked, only the syntax.  `fn()` uses this internally to distinguish callables from lambda expressions, while deferrring any class loading or function lookups until the resulting object is actually called.
 
