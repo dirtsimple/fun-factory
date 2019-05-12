@@ -7,11 +7,22 @@ class fn extends fun\Factory {
 		throw new \BadMethodCallException(static::class . " is not instantiable");
 	}
 
-	static function compose() {
-		$ops = [];
-		$args = func_num_args() > 1 ? array_reverse(func_get_args()) : func_get_args();
-		foreach ($args as $fn) {
+	static function _() {
+		static $factory, $cache=array();
+		$ct = func_num_args();
+		if ( $ct === 1 ) {
+			$fn = func_get_arg(0);
+			if ( $fn instanceof fun\Factory ) return $fn;
+			if ( is_string($fn) && array_key_exists($fn, $cache) ) return $cache[$fn];
+			# ... else fall through to composing a new factory
+		} elseif ( $ct === 0 ) {
+			return $factory = $factory ?: new fun\Factory(array());
+		}
+
+		$ops = array();
+		foreach (func_get_args() as $fn) {
 			if (is_string($fn) && ! static::is_callable_name($fn)) {
+				if ( $ct === 1 ) return $cache[$fn] = static::expr($fn);
 				$fn = static::expr($fn);
 			}
 			if ($fn instanceof fun\Factory) {
@@ -28,7 +39,9 @@ class fn extends fun\Factory {
 			if ( is_callable($fn, true) ) array_push($ops, [$fn, null, null]);
 			else throw new \BadFunctionCallException("$fn is not callable");
 		}
-		return new fun\Factory($ops);
+		$fn = new fun\Factory($ops);
+		if ( $ct === 1 && is_string($key = func_get_arg(0)) ) $cache[$key] = $fn;
+		return $fn;
 	}
 
 	static function bind($callable, ...$args) {

@@ -110,6 +110,13 @@ describe("fn", function() {
 
 });
 
+describe('fn::_()', function() {
+	it('pipes multiple arguments', function() {
+		$f = fn::_('array_reverse','array_flip');
+		expect($f(['foo','bar']))->to->equal(['bar'=>0,'foo'=>1]);
+	});
+});
+
 describe('fn::bind($callable, ...$args)', function() {
 	it('returns a callable that receives $args before the arg', tearDown(function(){
 		$mock = Mockery::mock();

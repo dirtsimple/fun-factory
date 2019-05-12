@@ -156,6 +156,12 @@ You can then compose or stack the result, or expose composable/stackable results
 
 But wait, there's more!  Add `use dirtsimple\fn;` to your code *now*, and you'll also get these fine static methods at no additional cost:
 
+### fn::_(...$callables)
+
+Return a *pipelined* composition of `$callables`, with the result of each callable passed to the next in the chain.  For example, `fn::_('array_reverse', 'array_flip')` returns a callable that calls `array_reverse()` on its input, and then calls `array_flip()` on the result.
+
+This method behaves exactly the same as `fn()`, including support for lambda strings, except that its arguments are called in the opposite order.  That is, `fn($f, $g)` is equivalent to `fn::_($g, $f)` is equivalent to `function ($x) { return $f( $g( $x ) ); }`.
+
 ### fn::bind($callable, ...$args)
 
 Returns a `fn()` that when called with `$x` returns `$callable(...$args, $x)`.  (That is, any arguments after `$callable` are passed in first.)  Note that `fn()` objects take exactly one parameter (which defaults to `null` if omitted), so `$callable()` will always receive exactly one argument after `$args`.
