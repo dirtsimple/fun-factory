@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# ---
+# Add your own commands, functions, and variables here.  Define defaults first,
+# then `dk use:` the desired devkit modules, and then define any overrides to
+# the devkit defaults.
+# ---
+
+# -- Language-Specific Modules --
+dk use: composer          # utilities for accessing composer-based dev tools
+dk use: peridot           # run tests using peridot-php
+
+# Define overrides, new commands, functions, etc. here:
