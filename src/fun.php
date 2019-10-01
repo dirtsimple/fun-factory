@@ -1,7 +1,7 @@
 <?php
 namespace dirtsimple;
 
-class fn extends fun\Factory {
+class fun extends fun\Factory {
 
 	function __construct() {
 		throw new \BadMethodCallException(static::class . " is not instantiable");
@@ -45,7 +45,7 @@ class fn extends fun\Factory {
 	}
 
 	static function bind($callable, ...$args) {
-		if (is_callable($callable)) return fn()->andThen($callable, $args);
+		if (is_callable($callable)) return fun()->andThen($callable, $args);
 		else throw new \BadFunctionCallException("$callable is not callable");
 	}
 
@@ -59,7 +59,7 @@ class fn extends fun\Factory {
 		return array_key_exists($expr, static::$exprs)
 			? static::$exprs[$expr]
 			: static::$exprs[$expr] = (
-				$expr == '$_' ? fn() : fn()->andThen(eval("return function(\$_) { return $expr; };"))
+				$expr == '$_' ? fun() : fun()->andThen(eval("return function(\$_) { return $expr; };"))
 			);
 	}
 
@@ -74,18 +74,18 @@ class fn extends fun\Factory {
 	}
 
 	static function val($value) {
-		return fn()->andThen(fun\Factory::OP_VAL, $value);
+		return fun()->andThen(fun\Factory::OP_VAL, $value);
 	}
 
 	static function tap(...$callables) {
-		return fn()->andThen(fun\Factory::OP_TAP, fn(...$callables));
+		return fun()->andThen(fun\Factory::OP_TAP, fun(...$callables));
 	}
 
 	static function when($cond, $ifTrue, $ifFalse='$_') {
-		return fn()->andThen(fun\Factory::OP_COND, fn($cond), [fn($ifTrue), fn($ifFalse)]);
+		return fun()->andThen(fun\Factory::OP_COND, fun($cond), [fun($ifTrue), fun($ifFalse)]);
 	}
 
 	static function unless($cond, $ifFalse, $ifTrue='$_') {
-		return fn()->andThen(fun\Factory::OP_COND, fn($cond), [fn($ifTrue), fn($ifFalse)]);
+		return fun()->andThen(fun\Factory::OP_COND, fun($cond), [fun($ifTrue), fun($ifFalse)]);
 	}
 }

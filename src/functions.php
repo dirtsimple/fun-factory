@@ -2,7 +2,7 @@
 
 namespace dirtsimple;
 
-function fn(...$args) {
+function fun(...$args) {
 	if ( count($args) >1 ) $args = array_reverse($args);
-	return fn::_(...$args);
+	return fun::_(...$args);
 }
